@@ -143,6 +143,12 @@
               >
                 forgot password? reset.
               </h1>
+              <div
+                class="bg-red-400 text-white py-2 px-1 border-l-8 border-red-700 rounded-lg"
+                v-show="emailErrMsg"
+              >
+                {{ emailErrMsg }}
+              </div>
               <form
                 @submit.prevent="resetPasswordWithMail"
                 class="flex justify-center gap-y-2 items-center mx-auto flex-col bg-slate-800 p-3 rounded-md"
@@ -260,17 +266,18 @@ export default {
       }
     };
     const resetPasswordWithMail = async () => {
-      const { data, error } = await auth.resetPasswordForEmail(emailReset.value, {
-        redirectTo: "http://localhost:3000/resetPassword",
-      });
+      const { data, error } = await auth.resetPasswordForEmail(
+        "francismwaniki630@gmail.com"
+      );
       if (error) {
-        errMsg.value = error.message;
+        emailErrMsg.value = error.message;
         setTimeout(() => {
-          errMsg.value = "";
+          emailErrMsg.value = "";
         }, 5000);
         console.log(error);
       } else {
         console.log(data);
+        console.log(emailReset.value);
       }
     };
 

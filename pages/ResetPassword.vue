@@ -8,25 +8,20 @@
           <div class="bg-slate-800 shadow-lg rounded-lg mt-9">
             <header class="text-center px-5 pb-5">
               <h3 class="text-xl font-bold text-gray-100 mb-1">Reset your password</h3>
-              <h6 class="text-sm font-light text-gray-100 mb-1 italic">
-                coming soon! to be used for email
-              </h6>
+              <div
+                class="bg-red-400 text-white py-2 px-1 border-l-8 border-red-700 rounded-lg"
+                v-show="emailErrMsg"
+              >
+                {{ emailErrMsg }}
+              </div>
             </header>
 
             <div class="bg-gray-700 text-center px-5 py-6">
-              <form class="space-y-3">
+              <form class="space-y-3" @submit.prevent="UpdatedUser">
                 <div
                   class="flex shadow-sm rounded justify-center items-center mx-auto gap-y-2 flex-col"
                 >
-                  <div class="">
-                    <input
-                      name="card-nr"
-                      class="text-sm text-gray-800 bg-white rounded leading-5 py-2 px-3 placeholder-gray-400 w-full border border-transparent focus:border-indigo-300 focus:ring-0"
-                      type="text"
-                      placeholder="Old Password"
-                      aria-label="Old Password"
-                    />
-                  </div>
+                  <div class=""></div>
                   <div class="">
                     <input
                       name="card-nr"
@@ -43,6 +38,7 @@
                       type="text"
                       placeholder="confirm password"
                       aria-label="confirm password"
+                      v-model="confirmPassword"
                     />
                   </div>
                 </div>
@@ -91,10 +87,33 @@ import { useRouter } from "vue-router";
 export default {
   setup() {
     const router = useRouter();
-    const client = useSupabaseClient();
+    /*    const client = useSupabaseClient(); */
+    const { auth } = useSupabaseClient();
     const user = useSupabaseUser();
+    const confirmPassword = ref("");
+    const emailErrMsg = ref("");
+
+    const UpdatedUser = async () => {
+      const { user, error } = await auth.updateUser({
+        password: confirmPassword.value,
+      });
+      if (error) {
+        emailErrMsg.value = error.message;
+        setTimeout(() => {
+          emailErrMsg.value = "";
+        }, 5000);
+
+        console.log(error);
+      } else {
+        console.log(user);
+        router.push("/");
+      }
+    };
     return {
       user,
+      UpdatedUser,
+      confirmPassword,
+      emailErrMsg,
     };
   },
 };
