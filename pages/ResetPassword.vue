@@ -7,27 +7,6 @@
         <div class="max-w-[360px] mx-auto">
           <div class="bg-slate-800 shadow-lg rounded-lg mt-9">
             <header class="text-center px-5 pb-5">
-              <span
-                class="flex justify-center items-center mx-auto flex-col mt-5"
-                v-show="user"
-              >
-                <span
-                  class="border-b border-orange-700 text-orange-600"
-                  v-show="user.phone"
-                  >{{ user.phone }}</span
-                >
-                <span
-                  class="border-b border-orange-700 text-orange-600"
-                  v-show="user.email"
-                  >{{ user.email }}</span
-                >
-                <!--  <img
-                  :src="user.user_metadata.avatar_url"
-                  class="h-20 w-20 rounded-full"
-                  alt=""
-                /> -->
-              </span>
-
               <h3 class="text-xl font-bold text-gray-100 mb-1">Reset your password</h3>
               <h6 class="text-sm font-light text-gray-100 mb-1 italic">
                 coming soon! to be used for email
@@ -114,10 +93,6 @@ export default {
     const router = useRouter();
     const client = useSupabaseClient();
     const user = useSupabaseUser();
-    definePageMeta({
-      middleware: "auth",
-    });
-
     return {
       user,
     };

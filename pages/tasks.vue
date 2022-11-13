@@ -23,22 +23,20 @@
     <main
       class="bg-slate-900 min-h-screen pb-6 flex justify-center flex-col items-center gap-y-11 overflow-auto max-w-6xl mx-auto"
     >
-      <span
-        class="flex justify-center items-center mx-auto flex-col mt-10"
-        v-show="user"
-      >
-        <img
+      <span class="flex justify-center items-center mx-auto flex-col mt-10" v-show="user">
+        <!-- <img
           :src="user.user_metadata.avatar_url"
           class="h-20 w-20 rounded-full"
           alt=""
-        />
+        /> -->
         <h3 class="text-white">
           <span class="font-extrabold">Signed as </span
-          ><span
-            class="border-b border-orange-700 text-orange-600"
-            v-show="user.phone"
-            >{{ user.phone }}</span
-          >
+          ><span class="border-b border-orange-700 text-orange-600" v-show="user.phone">{{
+            user.phone
+          }}</span>
+          <span class="border-b border-orange-700 text-orange-600" v-show="user.email">{{
+            user.email
+          }}</span>
         </h3>
       </span>
       <h1 class="text-white text-2xl text-center">Supabase todo App</h1>
@@ -98,9 +96,7 @@
                   >
                     Incomplete
                   </p>
-                  <div
-                    class="flex justify-center items-center flex-row mx-auto gap-x-1"
-                  >
+                  <div class="flex justify-center items-center flex-row mx-auto gap-x-1">
                     <div
                       class="w-10 relative mr-2 align-middle select-none transition duration-200 ease-in"
                     >
