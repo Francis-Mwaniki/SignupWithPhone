@@ -116,9 +116,9 @@ export default {
     const router = useRouter();
     const client = useSupabaseClient();
     const user = useSupabaseUser();
-    /*  definePageMeta({
+    definePageMeta({
       middleware: "auth",
-    }); */
+    });
 
     return {
       user,
