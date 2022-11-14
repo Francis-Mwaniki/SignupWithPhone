@@ -29,9 +29,7 @@
           <input
             type="submit"
             value="Send"
-            :class="[loading ? 'submitting..' : 'submit']"
-            :disabled="loading"
-            class="bg-indigo-600 text-white px-14 py-2 rounded-md"
+            class="bg-indigo-600 cursor-pointer text-white px-14 py-2 rounded-md"
           />
         </form>
         <form
@@ -58,9 +56,7 @@
           <input
             type="submit"
             value="Verify"
-            :class="[loading ? 'verifying..' : 'submit']"
-            :disabled="loading"
-            class="bg-indigo-600 text-white px-14 py-2 rounded-md"
+            class="bg-indigo-600 cursor-pointer text-white px-14 py-2 rounded-md"
           />
         </form>
         <!-- EMAIL AUTH -->
@@ -112,9 +108,7 @@
               <input
                 type="submit"
                 value="Send"
-                class="bg-indigo-600 text-white px-14 py-2 rounded-md"
-                :disabled="loading"
-                :class="[loading ? 'submitting..' : 'submit']"
+                class="bg-indigo-600 text-white cursor-pointer px-14 py-2 rounded-md"
               />
             </form>
             <form
@@ -138,9 +132,7 @@
               <input
                 type="submit"
                 value="Verify"
-                :disabled="loading"
-                :class="[loading ? 'verifying..' : 'submit']"
-                class="bg-indigo-600 text-white px-14 py-2 rounded-md"
+                class="bg-indigo-600 cursor-pointer text-white px-14 py-2 rounded-md"
               />
             </form>
             <div
@@ -172,9 +164,7 @@
                 <input
                   type="submit"
                   value="Reset"
-                  class="no-underline px-7 py-2 bg-indigo-600 rounded-lg text-indigo-100"
-                  :class="[loading ? 'resetting' : 'Reset']"
-                  :disabled="loading"
+                  class="no-underline px-7 py-2 cursor-pointer bg-indigo-600 rounded-lg text-indigo-100"
                 />
               </form>
             </div>
@@ -197,9 +187,9 @@ export default {
     let emailSuccess = ref("");
     const newPassword = ref("");
     const loading = ref(false);
+    const phoneVerify = ref("");
     const emailReset = ref("");
     const emailErrMsg = ref("");
-
     const email = ref("");
     const confirmEmail = ref("");
     const password = ref("");
@@ -213,7 +203,7 @@ export default {
 
     const signInWithPhone = async () => {
       loading.value = true;
-      const { user, error } = await auth.signInWithOtp({
+      const { data, error } = await auth.signInWithOtp({
         phone: `+254${phone.value}`,
       });
       if (error) {
@@ -225,7 +215,7 @@ export default {
 
         console.log(error);
       } else {
-        console.log(user);
+        console.log(data);
       }
     };
     const signInWithEmail = async () => {
@@ -269,19 +259,12 @@ export default {
       }
     };
     const verifyPhoneWithToken = async () => {
-      loading.value = true;
       const { data, error } = await auth.verifyOtp({
-        phone: `+254${phone.value}`,
-        token: token.value,
+        phone,
+        token,
         type: "sms",
       });
-
       if (error) {
-        loading.value = false;
-        errMsg.value = error.message;
-        setTimeout(() => {
-          errMsg.value = "";
-        }, 5000);
         console.log(error);
       } else {
         console.log(data);
@@ -326,19 +309,6 @@ export default {
        * ask the user to reset their password.
        */
     };
-    watchEffect(() => {
-      auth.onAuthStateChange(async (event, session) => {
-        if (event == "PASSWORD_RECOVERY") {
-          const newPassword = prompt("What would you like your new password to be?");
-          const { data, error } = await auth.updateUser({
-            password: newPassword,
-          });
-
-          if (data) alert("Password updated successfully!");
-          if (error) alert("There was an error updating your password.");
-        }
-      });
-    }, []);
 
     return {
       user,
@@ -353,6 +323,7 @@ export default {
       emailReset,
       loading,
       phone,
+      phoneVerify,
       errMsg,
       email,
       signInWithEmail,
