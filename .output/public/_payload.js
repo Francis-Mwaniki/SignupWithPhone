@@ -1,0 +1,1 @@
+export default {data:{},state:{$ssupabase_user:null},prerenderedAt:1668432424243}

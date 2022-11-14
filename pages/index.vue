@@ -226,7 +226,6 @@ export default {
         console.log(error);
       } else {
         console.log(user);
-        loading.value = false;
       }
     };
     const signInWithEmail = async () => {
@@ -266,7 +265,6 @@ export default {
 
         console.log(error);
       } else {
-        loading.value = false;
         console.log(user);
       }
     };
@@ -321,7 +319,7 @@ export default {
         }, 5000);
         console.log(error);
       }
-      loading.value = false;
+
       console.log(data);
       /**
        * Step 2: Once the user is redirected back to your application,
