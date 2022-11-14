@@ -266,9 +266,9 @@ export default {
       }
     };
     const resetPasswordWithMail = async () => {
-      const { data, error } = await auth.resetPasswordForEmail(
-        "francismwaniki630@gmail.com"
-      );
+      const { data, error } = await auth.resetPasswordForEmail(emailReset.value, {
+        redirectTo: "https://google.com",
+      });
       if (error) {
         emailErrMsg.value = error.message;
         setTimeout(() => {
@@ -276,8 +276,9 @@ export default {
         }, 5000);
         console.log(error);
       } else {
-        console.log(data);
-        console.log(emailReset.value);
+        auth.onAuthStateChange((event, session) => {
+          if (event == "PASSWORD_RECOVERY") console.log("PASSWORD_RECOVERY", session);
+        });
       }
     };
 
