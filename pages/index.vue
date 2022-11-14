@@ -29,6 +29,8 @@
           <input
             type="submit"
             value="Send"
+            :class="[loading ? 'submitting..' : 'submit']"
+            :disabled="loading"
             class="bg-indigo-600 text-white px-14 py-2 rounded-md"
           />
         </form>
@@ -56,6 +58,8 @@
           <input
             type="submit"
             value="Verify"
+            :class="[loading ? 'verifying..' : 'submit']"
+            :disabled="loading"
             class="bg-indigo-600 text-white px-14 py-2 rounded-md"
           />
         </form>
@@ -109,6 +113,8 @@
                 type="submit"
                 value="Send"
                 class="bg-indigo-600 text-white px-14 py-2 rounded-md"
+                :disabled="loading"
+                :class="[loading ? 'submitting..' : 'submit']"
               />
             </form>
             <form
@@ -132,6 +138,8 @@
               <input
                 type="submit"
                 value="Verify"
+                :disabled="loading"
+                :class="[loading ? 'verifying..' : 'submit']"
                 class="bg-indigo-600 text-white px-14 py-2 rounded-md"
               />
             </form>
@@ -142,6 +150,7 @@
                 class="text-lg font-bold text-white mt-1 flex justify-center items-center mx-auto"
               >
                 forgot password? reset.
+                <span class="text-sm italic">(coming soon!)</span>
               </h1>
               <div
                 class="bg-red-400 text-white py-2 px-1 border-l-8 border-red-700 rounded-lg"
@@ -164,6 +173,8 @@
                   type="submit"
                   value="Reset"
                   class="no-underline px-7 py-2 bg-indigo-600 rounded-lg text-indigo-100"
+                  :class="[loading ? 'resetting' : 'Reset']"
+                  :disabled="loading"
                 />
               </form>
             </div>
@@ -184,6 +195,8 @@ export default {
     const token = ref("");
     let errMsg = ref("");
     let emailSuccess = ref("");
+    const newPassword = ref("");
+    const loading = ref(false);
     const emailReset = ref("");
     const emailErrMsg = ref("");
 
@@ -199,10 +212,12 @@ export default {
     });
 
     const signInWithPhone = async () => {
+      loading.value = true;
       const { user, error } = await auth.signInWithOtp({
         phone: `+254${phone.value}`,
       });
       if (error) {
+        loading.value = false;
         errMsg.value = error.message;
         setTimeout(() => {
           errMsg.value = "";
@@ -211,14 +226,17 @@ export default {
         console.log(error);
       } else {
         console.log(user);
+        loading.value = false;
       }
     };
     const signInWithEmail = async () => {
+      loading.value = true;
       const { user, error } = await auth.signUp({
         email: email.value,
         password: password.value,
       });
       if (error) {
+        loading.value = false;
         emailErrMsg.value = error.message;
         setTimeout(() => {
           emailErrMsg.value = "";
@@ -226,6 +244,7 @@ export default {
 
         console.log(error);
       } else {
+        loading.value = false;
         emailSuccess.value = "VERIFY! your email to continue to login!";
         email.value = "";
         password.value = "";
@@ -233,11 +252,13 @@ export default {
       }
     };
     const verifyEmail = async () => {
+      loading.value = true;
       const { user, error } = await auth.signInWithPassword({
         email: confirmEmail.value,
         password: confirmPassword.value,
       });
       if (error) {
+        loading.value = false;
         emailErrMsg.value = error.message;
         setTimeout(() => {
           emailErrMsg.value = "";
@@ -245,10 +266,12 @@ export default {
 
         console.log(error);
       } else {
+        loading.value = false;
         console.log(user);
       }
     };
     const verifyPhoneWithToken = async () => {
+      loading.value = true;
       const { data, error } = await auth.verifyOtp({
         phone: `+254${phone.value}`,
         token: token.value,
@@ -256,6 +279,7 @@ export default {
       });
 
       if (error) {
+        loading.value = false;
         errMsg.value = error.message;
         setTimeout(() => {
           errMsg.value = "";
@@ -266,7 +290,8 @@ export default {
       }
     };
     const resetPasswordWithMail = async () => {
-      const { data, error } = await auth.resetPasswordForEmail(emailReset.value, {
+      loading.value = true;
+      /*  const { data, error } = await auth.resetPasswordForEmail(emailReset.value, {
         redirectTo: "https://google.com",
       });
       if (error) {
@@ -279,12 +304,48 @@ export default {
         auth.onAuthStateChange((event, session) => {
           if (event == "PASSWORD_RECOVERY") console.log("PASSWORD_RECOVERY", session);
         });
+      } */
+      /**
+       * Step 1: Send the user an email to get a password reset token.
+       * This email contains a link which sends the user back to your application.
+       */
+      const { data, error } = await auth.resetPasswordForEmail(emailReset.value, {
+        redirectTo:
+          "https://bcpxyrcfxzdmxjqggixm.supabase.co/auth/v1/callback/ResetPassword/",
+      });
+      if (error) {
+        loading.value = false;
+        emailErrMsg.value = error.message;
+        setTimeout(() => {
+          emailErrMsg.value = "";
+        }, 5000);
+        console.log(error);
       }
+      loading.value = false;
+      console.log(data);
+      /**
+       * Step 2: Once the user is redirected back to your application,
+       * ask the user to reset their password.
+       */
     };
+    watchEffect(() => {
+      auth.onAuthStateChange(async (event, session) => {
+        if (event == "PASSWORD_RECOVERY") {
+          const newPassword = prompt("What would you like your new password to be?");
+          const { data, error } = await auth.updateUser({
+            password: newPassword,
+          });
+
+          if (data) alert("Password updated successfully!");
+          if (error) alert("There was an error updating your password.");
+        }
+      });
+    }, []);
 
     return {
       user,
       auth,
+      newPassword,
       signInWithPhone,
       verifyPhoneWithToken,
       token,
@@ -292,6 +353,7 @@ export default {
       emailSuccess,
       emailErrMsg,
       emailReset,
+      loading,
       phone,
       errMsg,
       email,
