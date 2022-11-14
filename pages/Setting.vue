@@ -21,11 +21,6 @@
                   v-show="user.email"
                   >{{ user.email }}</span
                 >
-                <!--  <img
-                  :src="user.user_metadata.avatar_url"
-                  class="h-20 w-20 rounded-full"
-                  alt=""
-                /> -->
               </span>
 
               <h3 class="text-xl font-bold text-gray-100 mb-1">Reset your password</h3>
